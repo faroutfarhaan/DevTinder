@@ -1,5 +1,6 @@
 const mongoose= require("mongoose");
 const{Schema}=require("mongoose");
+const validator=require("validator");
 const userSchema=new Schema({
     firstName:{
         type:String,
@@ -14,7 +15,12 @@ const userSchema=new Schema({
         required:true,
         unique:true,
         trim:true,
-        lowercase:true
+        lowercase:true,
+        validate(value){
+           if(!validator.isEmail(value)){
+            throw new Error("Invalid Email address"+value);
+           }
+        }
     },
     age:{
         type:String,
@@ -38,7 +44,29 @@ const userSchema=new Schema({
     password:{
         type:String,
         minLength:8,
-        required:true
+        required:true,
+        validate(value){
+            if(!validator.isStrongPassword(value)){
+                throw new Error("Password is weak");
+        }
+    },
+    skills:{
+        type:[String],
+        maxlength:10
+    },
+    about:{
+        type: String,
+        maxlength:100,
+        default:"Hey there, I m using DevTinder."
+    },
+    photoUrl:{
+        type:String,
+        default:"https://images.app.goo.gl/DXot8tb2dzE6jXPPA",
+        vaidate(value){
+            if(!validator.isURL(value)){
+                throw new Error("Invalid photo");
+            }
+        }
     }
 },{
     timestamps:true

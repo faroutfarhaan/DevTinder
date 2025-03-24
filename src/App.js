@@ -46,24 +46,33 @@ app.delete("/user", async (req,res)=>{
 
 });
 // update api
-app.patch("/user", async (req,res)=>{
-    const userId=req.body.userId;
+app.patch("/user/userId", async (req,res)=>{
+    const userId=req.params.userId;
     const data=req.body;
     try{
+        const ALLOWED_UPDATES=["photoUrl","gender","skills","firstName","lastName","about"];
+        const isUpdateAllowed=object.keys(data).every((k)=>ALLOWED_UPDATES.includes(k));
+        if(!isUpdateAllowed){
+            throw new Error("Invalid update");
+        }
       await User.findByIdAndUpdate({_id:userId},data,{runValidations:true});
       res.send("User updated");
     }
     catch(err){
-        res.status(400).send("Something went wrong");
+        res.status(400).send("UPDATE FAILURE:"+ err.message);
     }
 });
 // SignUp Api
 app.post("/signup",async (req,res)=>{
-    try{ const user=new User(req.body);
+    try{
+        if(req.body.age<18){
+            throw new Error("Age must be 18 or above");
+        } 
+        const user=new User(req.body);
     await user.save();
     res.send("User Signed Up!");}
     catch(err){
-        console.log(err);
+        res.status(400).send("Error Occured:"+err.message);
     };
 });
 // connecting to DB
