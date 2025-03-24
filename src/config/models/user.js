@@ -49,7 +49,7 @@ const userSchema=new Schema({
             if(!validator.isStrongPassword(value)){
                 throw new Error("Password is weak");
         }
-    },
+    }},
     skills:{
         type:[String],
         maxlength:10
@@ -70,6 +70,6 @@ const userSchema=new Schema({
     }
 },{
     timestamps:true
-})
+});
 const User = mongoose.model("User",userSchema);
 module.exports=User;

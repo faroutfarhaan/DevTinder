@@ -2,6 +2,9 @@ const express = require("express");
 const app =express();
 const {connectDB}=require("./config/database.js");
 const User=require("./config/models/user.js");
+const {validateSignup}=require("./utils/validatorSignUp.js");
+const bcrypt=require('bcrypt');
+const saltRounds=10;
 app.use(express.json());
 // Get user using email API
 app.get("/user", async (req,res)=>{
@@ -64,11 +67,27 @@ app.patch("/user/userId", async (req,res)=>{
 });
 // SignUp Api
 app.post("/signup",async (req,res)=>{
-    try{
-        if(req.body.age<18){
-            throw new Error("Age must be 18 or above");
+    // Validate
+try{
+   validateSignup(req);
+
+const {firstName,lastName,email,age,password}=req.body;
+    // encrypt password
+    const hashedPassword=await bcrypt.hash(password, saltRounds);
+    // Send to DB
+   
+        if(age<15){
+            throw new Error("Age must be 15 or above");
         } 
-        const user=new User(req.body);
+        const user=new User(
+            {
+                firstName,
+                lastName,
+                email,
+                age,
+                password:hashedPassword
+            }
+        );
     await user.save();
     res.send("User Signed Up!");}
     catch(err){
