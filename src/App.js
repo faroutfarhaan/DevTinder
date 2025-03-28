@@ -7,6 +7,7 @@ const bcrypt=require('bcrypt');
 const saltRounds=10;
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
+const {userAuth}=require("./config/middlewares/Auth.js");
 app.use(express.json());
 app.use(cookieParser());
 // Get user using email API
@@ -119,19 +120,11 @@ app.post("/login",async (req,res)=>{
     }
 })
 // profile API
-app.get("/profile", async (req,res)=>{
+app.get("/profile",userAuth, async (req,res)=>{
     try{
-       const cookies=req.cookies;
-       const {token}=cookies;
-
-       const decoded=await jwt.verify(token,"AbraCaDabra@123");
-       if(!decoded._id){
-        throw new Error("Not signed in.");
-       }
-       const user=await User.findById(decoded._id);
-       if(!user){
-        throw new Error("User not found");
-       }
+       
+       const user=req.user;
+       
        res.send(user);
 
     }
