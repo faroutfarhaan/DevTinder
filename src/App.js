@@ -5,7 +5,10 @@ const User=require("./config/models/user.js");
 const {validateSignup}=require("./utils/validatorSignUp.js");
 const bcrypt=require('bcrypt');
 const saltRounds=10;
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 app.use(express.json());
+app.use(cookieParser());
 // Get user using email API
 app.get("/user", async (req,res)=>{
     const userEmail=req.body.email;
@@ -105,12 +108,38 @@ app.post("/login",async (req,res)=>{
        if(!isValidPassword){
         throw new Error("Invalid password");
        }else{
+        //create token
+        const token= await jwt.sign({_id:user._id},"AbraCaDabra@123");
+        //send the token to user
+        res.cookie("token",token);
         res.send("User logged in");
        }
     }catch(err){
         res.status(400).send("Error Occured:"+err.message);
     }
 })
+// profile API
+app.get("/profile", async (req,res)=>{
+    try{
+       const cookies=req.cookies;
+       const {token}=cookies;
+
+       const decoded=await jwt.verify(token,"AbraCaDabra@123");
+       if(!decoded._id){
+        throw new Error("Not signed in.");
+       }
+       const user=await User.findById(decoded._id);
+       if(!user){
+        throw new Error("User not found");
+       }
+       res.send(user);
+
+    }
+    catch(err){
+        res.status(400).send("Error Occured:"+err.message);
+    }
+    
+});
 // connecting to DB
 connectDB()
 .then( ()=>{
