@@ -1,5 +1,5 @@
-const validator=require('validator');
-const validateSignup=()=>{
+const validator=require("validator");
+const validateSignup=(req)=>{
     const {firstName, lastName, password, email, age }=req.body;
     if(!validator.isEmail(email)){
         throw new Error("Invalid email");
@@ -11,4 +11,4 @@ const validateSignup=()=>{
         throw new Error("First name and last name cannot be empty");
     }
 };
-module.exports=validateSignup;
+module.exports = { validateSignup };

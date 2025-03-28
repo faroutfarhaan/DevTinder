@@ -76,9 +76,7 @@ const {firstName,lastName,email,age,password}=req.body;
     const hashedPassword=await bcrypt.hash(password, saltRounds);
     // Send to DB
    
-        if(age<15){
-            throw new Error("Age must be 15 or above");
-        } 
+       
         const user=new User(
             {
                 firstName,
@@ -94,6 +92,24 @@ const {firstName,lastName,email,age,password}=req.body;
         res.status(400).send("Error Occured:"+err.message);
     };
 });
+// Login Api
+app.post("/login",async (req,res)=>{
+    try{
+       const {email,password}=req.body;
+       const user=await User.findOne({email:email});
+       if(!user){
+        throw new Error("Invalid email");
+       }
+       const isValidPassword=await bcrypt.compare(password,user.password);
+       if(!isValidPassword){
+        throw new Error("Invalid password");
+       }else{
+        res.send("User logged in");
+       }
+    }catch(err){
+        res.status(400).send("Error Occured:"+err.message);
+    }
+})
 // connecting to DB
 connectDB()
 .then( ()=>{
