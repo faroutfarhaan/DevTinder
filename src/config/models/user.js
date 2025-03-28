@@ -27,10 +27,11 @@ const userSchema=new Schema({
         min:15
     },
     phone:{
-        type:String,
-        unique:true,
-        minLength:10,
-        maxlength:10
+        type: String,
+        required: [true, "Phone number is required"],
+        unique: true,
+        minLength: 10,
+        maxlength: 10
     },
     gender:{
         type:String,

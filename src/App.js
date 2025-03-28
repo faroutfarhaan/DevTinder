@@ -71,7 +71,7 @@ app.post("/signup",async (req,res)=>{
 try{
    validateSignup(req);
 
-const {firstName,lastName,email,age,password}=req.body;
+const {firstName,lastName,email,age,password,phone}=req.body;
     // encrypt password
     const hashedPassword=await bcrypt.hash(password, saltRounds);
     // Send to DB
@@ -83,7 +83,8 @@ const {firstName,lastName,email,age,password}=req.body;
                 lastName,
                 email,
                 age,
-                password:hashedPassword
+                password:hashedPassword,
+                phone
             }
         );
     await user.save();
