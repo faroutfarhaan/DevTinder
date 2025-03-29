@@ -105,14 +105,14 @@ app.post("/login",async (req,res)=>{
        if(!user){
         throw new Error("Invalid email");
        }
-       const isValidPassword=await bcrypt.compare(password,user.password);
+       const isValidPassword=await user.validatePassword(password);
        if(!isValidPassword){
         throw new Error("Invalid password");
        }else{
         //create token
-        const token= await jwt.sign({_id:user._id},"AbraCaDabra@123");
+        const token= await user.getJWT();
         //send the token to user
-        res.cookie("token",token);
+        res.cookie("token",token,{expires: new Date(Date.now()+ 8*3600000)});
         res.send("User logged in");
        }
     }catch(err){
