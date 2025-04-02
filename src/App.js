@@ -1,10 +1,6 @@
 const express = require("express");
 const app =express();
 const {connectDB}=require("./config/database.js");
-// const User=require("./config/models/user.js");
-
-
-
 const cookieParser = require('cookie-parser');
 
 

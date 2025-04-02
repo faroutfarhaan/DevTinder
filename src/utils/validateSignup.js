@@ -14,4 +14,9 @@ const validateSignup = (req) => {
         throw new Error("Phone number must be 10 digits");
     }
 };
-module.exports = { validateSignup };
+const validateProfileUpdate=(req)=>{
+    const authorizedFields=["firstName","lastName","age","about","gender","photoUrl","skills"];
+    const isAllowed=Object.keys(req.body).every(fields=>authorizedFields.includes(fields));
+    return isAllowed;
+}
+module.exports = { validateSignup,validateProfileUpdate };
