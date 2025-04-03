@@ -1,6 +1,9 @@
 const express=require('express');
 const profileRouter=express.Router();
 const {userAuth}=require("../config/middlewares/Auth.js");
+const bcrypt=require('bcrypt');
+const saltRounds=10;
+const validator=require('validator');
 
 profileRouter.get("/profile/view",userAuth, async (req,res)=>{
     try{
@@ -32,5 +35,26 @@ profileRouter.patch("/profile/edit",userAuth,async (req,res)=>{
     }catch(err){
         res.status(400).send("Error Occured:"+err.message);
     }
-})
+});
+profileRouter.patch("/profile/password",userAuth,async (req,res)=>{
+    try{
+        const loggedUser=req.user;
+        const {password}=req.body;
+        
+        if(!validator.isStrongPassword(password) ){
+            throw new Error("Password is not strong");
+        }
+        const isSame=await bcrypt.compare(password,loggedUser.password);
+        if(isSame){
+            throw new Error("New password is same as old");
+        }
+        const hashedPassword=await bcrypt.hash(password,saltRounds);
+        loggedUser.password=hashedPassword;
+        loggedUser.save();
+        res.send("Password updated successfully");
+
+    }catch(err){
+        res.status(400).send("Error Occured:"+err.message);
+    }
+});
 module.exports=profileRouter;
