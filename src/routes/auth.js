@@ -1,7 +1,7 @@
 const express =require('express');
 const bcrypt=require('bcrypt');
 const saltRounds=10;
-const {validateSignup}=require("../utils/validateSignup.js");
+const {validateSignup}=require("../utils/validator.js");
 const User = require("../config/models/user.js");
 const authRouter=express.Router();
 

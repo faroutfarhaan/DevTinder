@@ -1,8 +1,49 @@
 const express=require('express');
 const requestRouter=express.Router();
 const {userAuth}=require("../config/middlewares/Auth.js");
-requestRouter.post("/sendConnectionRequest",userAuth,async (req,res)=>{
+const ConnectionRequest=require("../config/models/connectionRequest.js");
+const User=require("../config/models/user.js");
+requestRouter.post("/request/send/:status/:toUserId",userAuth,async (req,res)=>{
+    try{
     const user=req.user;
-    res.send("sent");
+    const senderId=req.user._id;
+    const status=req.params.status;
+    const receiverId=req.params.toUserId;
+    const allowedStatus=["interested","ignored"];
+    if(!allowedStatus.includes(status)){
+        throw new Error("Invalid status");
+    };
+    if(senderId==receiverId){
+        throw new Error("You can't send request to yourself");
+    };
+    const isUserValid=await User.findById(receiverId);
+    if(!isUserValid){
+       return res.status(404).json({message:"User you are trying to send request doesn't exists."})
+    };
+    const existingConnectionRequest=await ConnectionRequest.findOne({
+        $or:[
+            {senderId,receiverId},
+            {senderId:receiverId,receiverId:senderId},
+        ],
+    });
+    if(existingConnectionRequest){
+        return res.status(400).json({message:"connection request already exists."});
+    };
+    const connectionRequest=new ConnectionRequest(
+         {
+            senderId,
+            receiverId,
+            status
+         }
+    );
+    await connectionRequest.save();
+    res.status(200).json({message:"connection request sent successfully"});
+
+}
+catch(err){
+    res.status(400).send("ERROR: "+ err.message);
+};
+
+    
 });
 module.exports=requestRouter;

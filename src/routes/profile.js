@@ -4,6 +4,7 @@ const {userAuth}=require("../config/middlewares/Auth.js");
 const bcrypt=require('bcrypt');
 const saltRounds=10;
 const validator=require('validator');
+const{validateProfileEdit}=require("../utils/validator.js")
 
 profileRouter.get("/profile/view",userAuth, async (req,res)=>{
     try{
@@ -50,7 +51,7 @@ profileRouter.patch("/profile/password",userAuth,async (req,res)=>{
         }
         const hashedPassword=await bcrypt.hash(password,saltRounds);
         loggedUser.password=hashedPassword;
-        loggedUser.save();
+       await loggedUser.save();
         res.send("Password updated successfully");
 
     }catch(err){

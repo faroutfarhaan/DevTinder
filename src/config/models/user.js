@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const userSchema=new Schema({
     firstName:{
         type:String,
+        index: true,
         required:true,
         trim:true
     },
@@ -37,12 +38,15 @@ const userSchema=new Schema({
     },
     gender:{
         type:String,
-        enum:["male","female","others"],
-        validator(value){
-            if(!["male","female","others"].includes(value)){
-                throw new err("Gender data is invalid")
-            }
-        }
+        enum:{
+            values:["male","female","others"],
+            message:'${VALUE} is not a valid gender'
+    }
+        // validator(value){
+        //     if(!["male","female","others"].includes(value)){
+        //         throw new err("Gender data is invalid")
+        //     }
+        // }
     },
     password:{
         type:String,
@@ -81,9 +85,10 @@ userSchema.methods.getJWT=async function (){
 };
 userSchema.methods.validatePassword= async function (passwordInputByUser){
     const user=this;
-    const passwordHash=this.password;
+    const passwordHash=user.password;
     const isValid=await bcrypt.compare(passwordInputByUser,passwordHash);
     return isValid;
 }
+userSchema.index({firstName: 1,lastName:1});
 const User = mongoose.model("User",userSchema);
 module.exports=User;
