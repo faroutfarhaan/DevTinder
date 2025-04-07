@@ -46,4 +46,36 @@ catch(err){
 
     
 });
+requestRouter.post("/request/review/:status/:requestId",userAuth,async (req,res)=>{
+      try{
+              const status=req.params.status;
+              const requestId=req.params.requestId;
+              const user=req.user;
+              const senderId=user._id;
+
+              
+              const allowedStatus=["accepted","rejected"];
+              if(!allowedStatus.includes(status)){
+                  throw new Error ("Invalid status");
+                }
+                
+                const connectionRequest= await ConnectionRequest.findById(requestId);
+                if(!connectionRequest){
+                    throw new Error ("connection request doesn't exists.");
+                }
+                const receiverId=connectionRequest.receiverId;
+                if(senderId==receiverId){
+                    throw new Error ("You can't review your own request");
+                }
+                if(connectionRequest.status=="ignored"){
+                    throw new Error ("You can't review ignored request");
+                }
+              
+              connectionRequest.status=status;
+              await connectionRequest.save();
+              res.status(200).json({message:"connection request " + status +" successfully"});
+      }catch(err){
+        res.status(400).send("ERROR: "+ err.message);
+      }
+});
 module.exports=requestRouter;
