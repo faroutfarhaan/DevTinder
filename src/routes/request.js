@@ -78,19 +78,5 @@ requestRouter.post("/request/review/:status/:requestId",userAuth,async (req,res)
         res.status(400).send("ERROR: "+ err.message);
       }
 });
-requestRouter.get("/request/received",userAuth,async(req,res)=>{
-    try{
-        const user =req.user;
-        const requests=await ConnectionRequest.find({
-            receiverId:user._id,
-            status: "interested"
-        });
-      
-        res.status(200).json(requests);
-                                  
-    }
-    catch(err){
-        res.status(400).send("ERROR: "+ err.message);
-    }
-})
+
 module.exports=requestRouter;
