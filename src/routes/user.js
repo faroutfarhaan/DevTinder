@@ -46,5 +46,30 @@ userRouter.get("/user/connections",userAuth,async (req,res)=>{
     }catch(err){
         res.status(400).send("ERROR: "+ err.message);
     }
-})
+});
+userRouter.get("/feed",userAuth,async (req,res)=>{
+     try{
+         const loggedUser=req.user;
+         const page=parseInt(req.query.page);
+         let limit=parseInt(req.query.limit);
+         limit=limit>50 ?50:limit;
+         const skip=(page-1)*limit;
+         const connections =await ConnectionRequest.find({
+            $or:[{senderId:loggedUser._id},{receiverId:loggedUser._id}]
+         }).select("senderId receiverId");
+         const hideUserFromFeed=new Set();
+         connections.forEach((req)=>{
+                hideUserFromFeed(req.senderId._id)
+                hideUserFromFeed(req.receiverId._id)
+         });
+         const feed=await User.find({
+            $and:[{_id: {$in: Array.from(hideUserFromFeed)}}
+                ,{_id: {$ne: loggedUser._id}},],
+            
+         }).select(SAFE_USER_DATA).skip(skip).limit(limit);
+         res.json({feed});
+     }catch(err){
+        res.status(400).send("ERROR: "+ err.message);
+     }
+});
 module.exports=userRouter;
