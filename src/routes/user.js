@@ -2,6 +2,7 @@ const express=require("express");
 const userRouter=express.Router();
 const {userAuth}=require("../config/middlewares/Auth");
 const ConnectionRequest=require("../config/models/connectionRequest");
+const User=require("../config/models/user");
 
 const SAFE_USER_DATA="firstName lastName skills about photoUrl age";
 userRouter.get("/user/requests/received",userAuth,async(req,res)=>{
@@ -59,8 +60,8 @@ userRouter.get("/feed",userAuth,async (req,res)=>{
          }).select("senderId receiverId");
          const hideUserFromFeed=new Set();
          connections.forEach((req)=>{
-                hideUserFromFeed(req.senderId._id)
-                hideUserFromFeed(req.receiverId._id)
+                hideUserFromFeed.add(req.senderId._id)
+                hideUserFromFeed.add(req.receiverId._id)
          });
          const feed=await User.find({
             $and:[{_id: {$in: Array.from(hideUserFromFeed)}}
