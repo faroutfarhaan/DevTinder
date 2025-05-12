@@ -34,7 +34,7 @@ const userSchema=new Schema({
         required: [true, "Phone number is required"],
         unique: true,
         minLength: 10,
-        maxlength: 10
+        maxLength: 10
     },
     gender:{
         type:String,
@@ -59,11 +59,11 @@ const userSchema=new Schema({
     }},
     skills:{
         type:[String],
-        maxlength:10
+        maxLength:10
     },
     about:{
         type: String,
-        maxlength:100,
+        maxLength:100,
         default:"Hey there, I m using DevTinder."
     },
     photoUrl:{
