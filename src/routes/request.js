@@ -6,7 +6,7 @@ const User=require("../config/models/user.js");
 requestRouter.post("/request/send/:status/:toUserId",userAuth,async (req,res)=>{
     try{
     const user=req.user;
-    const senderId=req.user._id;
+    const senderId=user._id;
     const status=req.params.status;
     const receiverId=req.params.toUserId;
     const allowedStatus=["interested","ignored"];
@@ -41,7 +41,8 @@ requestRouter.post("/request/send/:status/:toUserId",userAuth,async (req,res)=>{
 
 }
 catch(err){
-    res.status(400).send("ERROR: "+ err.message);
+    console.error("Request Error:", err);
+    res.status(400).json({ error: err.message });
 };
 
     

@@ -4,7 +4,7 @@ const {userAuth}=require("../config/middlewares/Auth");
 const ConnectionRequest=require("../config/models/connectionRequest");
 const User=require("../config/models/user");
 
-const SAFE_USER_DATA="firstName lastName skills about photoUrl age";
+const SAFE_USER_DATA="firstName lastName skills about photoUrl age gender";
 userRouter.get("/user/requests/received",userAuth,async(req,res)=>{
     try{
         const user =req.user;
@@ -17,7 +17,8 @@ userRouter.get("/user/requests/received",userAuth,async(req,res)=>{
                                   
     }
     catch(err){
-        res.status(400).send("ERROR: "+ err.message);
+        res.status(400).json({ message: err.message });
+
     }
 });
 userRouter.get("/user/connections",userAuth,async (req,res)=>{
@@ -64,13 +65,13 @@ userRouter.get("/feed",userAuth,async (req,res)=>{
                 hideUserFromFeed.add(req.receiverId._id)
          });
          const feed=await User.find({
-            $and:[{_id: {$in: Array.from(hideUserFromFeed)}}
+            $and:[{_id: {$nin: Array.from(hideUserFromFeed)}}
                 ,{_id: {$ne: loggedUser._id}},],
             
          }).select(SAFE_USER_DATA).skip(skip).limit(limit);
          res.json({feed});
      }catch(err){
-        res.status(400).send("ERROR: "+ err.message);
+        res.status(400).json({ message: err.message });
      }
 });
 module.exports=userRouter;

@@ -3,8 +3,16 @@ const app =express();
 const {connectDB}=require("./config/database.js");
 const cookieParser = require('cookie-parser');
 const cors =require('cors');
+const http=require("http");
+const {initializeSocket}=require("./utils/socket.js");
+
+
+const server=http.createServer(app);
+initializeSocket(server);
 app.use(cors({
     origin: "http://localhost:5173",
+     methods: ['GET', 'POST', 'PATCH', 'DELETE','PUT'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
     credentials:true
 }));
 app.use(express.json());
@@ -13,6 +21,7 @@ const authRouter=require("./routes/auth.js");
 const profileRouter=require("./routes/profile.js");
 const requestRouter=require("./routes/request.js");
 const userRouter=require("./routes/user.js");
+
 
 app.use("/",authRouter);
 app.use("/",profileRouter);
@@ -24,7 +33,7 @@ app.use("/",userRouter);
 connectDB()
 .then( ()=>{
     console.log("DB connected");
-    app.listen(3000,()=>{
+    server.listen(3000,()=>{
         console.log("Server is ready to serve mylord");
     });
 })

@@ -26,8 +26,10 @@ const userSchema=new Schema({
         }
     },
     age:{
-        type:String,
-        min:15
+        type: Number, 
+        required: [true, "Age is required"],
+        min: [15, "Age must be at least 15"],
+        max: [100, "Age cannot exceed 100"]
     },
     phone:{
         type: String,
@@ -38,9 +40,10 @@ const userSchema=new Schema({
     },
     gender:{
         type:String,
+        required:true,
         enum:{
             values:["male","female","others"],
-            message:'${VALUE} is not a valid gender'
+            message:'{VALUE} is not a valid gender'
     }
         // validator(value){
         //     if(!["male","female","others"].includes(value)){
@@ -68,8 +71,8 @@ const userSchema=new Schema({
     },
     photoUrl:{
         type:String,
-        default:"https://images.app.goo.gl/DXot8tb2dzE6jXPPA",
-        vaidate(value){
+        default:"https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png",
+        validate(value){
             if(!validator.isURL(value)){
                 throw new Error("Invalid photo");
             }
