@@ -13,8 +13,15 @@ const {initializeSocket}=require("./utils/socket.js");
 
 const server=http.createServer(app);
 initializeSocket(server);
+const allowedOrigins=["http://localhost:5173","https://dev-tinder-frontend-phi.vercel.app"];
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: (origin,callback)=>{
+        if(!origin || allowedOrigins.includes(origin)){
+            callback(null,true);
+        }else{
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
      methods: ['GET', 'POST', 'PATCH', 'DELETE','PUT'],
   allowedHeaders: ['Content-Type', 'Authorization'],
     credentials:true
