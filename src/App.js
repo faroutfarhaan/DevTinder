@@ -1,3 +1,6 @@
+// do only once in the main entry file of app only
+require('dotenv').config()
+
 const express = require("express");
 const app =express();
 const {connectDB}=require("./config/database.js");
@@ -5,6 +8,7 @@ const cookieParser = require('cookie-parser');
 const cors =require('cors');
 const http=require("http");
 const {initializeSocket}=require("./utils/socket.js");
+
 
 
 const server=http.createServer(app);
@@ -33,7 +37,7 @@ app.use("/",userRouter);
 connectDB()
 .then( ()=>{
     console.log("DB connected");
-    server.listen(3000,()=>{
+    server.listen(process.env.PORT,()=>{
         console.log("Server is ready to serve mylord");
     });
 })
