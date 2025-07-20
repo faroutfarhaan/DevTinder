@@ -44,6 +44,7 @@ authRouter.post("/login", async (req, res) => {
     } else {
       //create token
       const token = await user.getJWT();
+      console.log("got token from user",token);
       //send the token to user
       res.cookie("token", token, {
         httpOnly: true,
@@ -51,6 +52,7 @@ authRouter.post("/login", async (req, res) => {
         sameSite: "None",
         expires: new Date(Date.now() + 8 * 3600000),
       });
+      console.log("cookie set successfully");
       res.send(user);
     }
   } catch (err) {
